@@ -5,6 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Property Pitching – Activity Hub</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .agent-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+    .agent-row input { flex: 1; margin-bottom: 0; }
+    .btn-remove-agent {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer;
+      font-size: 1rem; flex-shrink: 0; transition: all 0.15s;
+    }
+    .btn-remove-agent:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-add-agent {
+      background: none; border: 1px dashed var(--border); color: var(--text-muted);
+      border-radius: var(--radius-sm); padding: 0.4rem 0.85rem; font-size: 0.8rem;
+      cursor: pointer; font-family: inherit; transition: all 0.15s; margin-top: 0.25rem;
+    }
+    .btn-add-agent:hover { border-color: var(--accent); color: var(--accent-light); }
+
+    .link-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .link-pair input:last-child { color: var(--accent-light); }
+    .field-hint { font-size: 0.73rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* Pitch preview modal */
+    #pitchModal .modal {
+      max-width: 780px; width: 95%;
+    }
+    .pitch-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      font-family: 'Georgia', serif;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      max-height: 60vh;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .pitch-output .placeholder { color: var(--warning); font-style: italic; }
+
+    .pitch-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    /* Status dot in tracker */
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+    .dot-pending { background: var(--warning); }
+    .dot-pitched { background: var(--accent-light); }
+    .dot-followup { background: var(--success); }
+    .dot-placed { background: #6fffc0; }
+    .dot-declined { background: var(--danger); }
+    .dot-hold { background: var(--text-muted); }
+  </style>
 </head>
 <body>
 
@@ -19,7 +70,7 @@
 <div class="container">
   <div class="page-header">
     <h1>🏢 Property Pitching</h1>
-    <p>Capture new pitches and track progress across your pipeline.</p>
+    <p>Fill in the details below to generate and store a media pitch ready to send to publishers.</p>
   </div>
 
   <div class="tabs">
@@ -32,219 +83,186 @@
   <!-- ──────────────── INTAKE FORM ──────────────── -->
   <div class="tab-panel active" id="tab-intake">
     <div class="form-card">
-
       <form id="pitchForm" novalidate>
 
-        <!-- 1. Property Details -->
+        <!-- 1. Campaign Info -->
         <div class="form-section">
-          <div class="form-section-title">Property Details</div>
+          <div class="form-section-title">Campaign Info</div>
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>State <span class="req">*</span></label>
+              <input type="text" name="state" placeholder="e.g. California" required />
+            </div>
+            <div class="form-group">
+              <label>Launch Month <span class="req">*</span></label>
+              <input type="text" name="launchMonth" placeholder="e.g. July 2025" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Property Info -->
+        <div class="form-section">
+          <div class="form-section-title">Property Info</div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Property Name / Listing Title <span class="req">*</span></label>
-              <input type="text" name="propertyName" placeholder="e.g. The Meridian Office Tower" required />
+              <label>Address <span class="req">*</span></label>
+              <input type="text" name="address" placeholder="Full street address, City, State, Zip" required />
             </div>
           </div>
 
           <div class="form-row cols-2">
             <div class="form-group">
-              <label>Property Type <span class="req">*</span></label>
-              <select name="propertyType" required>
-                <option value="">Select type…</option>
-                <option>Residential – Apartment</option>
-                <option>Residential – House</option>
-                <option>Commercial – Office</option>
-                <option>Commercial – Retail</option>
-                <option>Commercial – Warehouse / Industrial</option>
-                <option>Mixed-Use</option>
-                <option>Land / Development Site</option>
-                <option>Hospitality</option>
-                <option>Other</option>
-              </select>
+              <label>Price <span class="req">*</span></label>
+              <input type="text" name="price" placeholder="e.g. $2,500,000" required />
             </div>
             <div class="form-group">
-              <label>Location / Address <span class="req">*</span></label>
-              <input type="text" name="location" placeholder="Street, City, State" required />
-            </div>
-          </div>
-
-          <div class="form-row cols-3">
-            <div class="form-group">
-              <label>Asking Price / Budget</label>
-              <input type="text" name="askingPrice" placeholder="e.g. $2,500,000" />
-            </div>
-            <div class="form-group">
-              <label>Property Size</label>
-              <input type="text" name="propertySize" placeholder="e.g. 1,200 sqm" />
-            </div>
-            <div class="form-group">
-              <label>Year Built</label>
-              <input type="text" name="yearBuilt" placeholder="e.g. 2018" />
-            </div>
-          </div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Zoning / Use Class</label>
-              <input type="text" name="zoning" placeholder="e.g. B1 – Business, R2 – Low Density" />
-            </div>
-            <div class="form-group">
-              <label>Tenancy Status</label>
-              <select name="tenancyStatus">
-                <option value="">Select…</option>
-                <option>Vacant</option>
-                <option>Owner-Occupied</option>
-                <option>Fully Tenanted</option>
-                <option>Partially Tenanted</option>
-              </select>
+              <label>Douglas Elliman Listing URL</label>
+              <input type="url" name="listingUrl" placeholder="https://elliman.com/listing/…" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Key Features / Highlights</label>
-              <textarea name="keyFeatures" placeholder="Corner lot, sea views, recently renovated lobby, EV charging…"></textarea>
+              <label>MLS Property Description <span class="req">*</span></label>
+              <textarea name="mlsDescription" placeholder="Paste the verbatim MLS listing description here…" style="min-height:130px" required></textarea>
             </div>
           </div>
         </div>
 
-        <!-- 2. Client / Contact -->
+        <!-- 3. Listing Agents -->
         <div class="form-section">
-          <div class="form-section-title">Client / Contact</div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Client / Contact Name <span class="req">*</span></label>
-              <input type="text" name="clientName" placeholder="Full name" required />
-            </div>
-            <div class="form-group">
-              <label>Company / Organisation</label>
-              <input type="text" name="company" placeholder="Company name" />
+          <div class="form-section-title">Listing Agent(s) <span class="req">*</span></div>
+          <div id="agentList">
+            <div class="agent-row">
+              <input type="text" name="agents" placeholder="Agent name" required />
+              <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
             </div>
           </div>
+          <button type="button" class="btn-add-agent" id="addAgentBtn">+ Add another agent</button>
+        </div>
 
+        <!-- 4. Photography -->
+        <div class="form-section">
+          <div class="form-section-title">Photography</div>
           <div class="form-row cols-2">
             <div class="form-group">
-              <label>Email</label>
-              <input type="email" name="clientEmail" placeholder="contact@example.com" />
+              <label>Photos by (Photographer name)</label>
+              <input type="text" name="photographer" placeholder="Photographer's name" />
             </div>
             <div class="form-group">
-              <label>Phone</label>
-              <input type="tel" name="clientPhone" placeholder="+1 555 000 0000" />
-            </div>
-          </div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Client Type</label>
-              <select name="clientType">
-                <option value="">Select…</option>
-                <option>Buyer – Owner-Occupier</option>
-                <option>Buyer – Investor</option>
-                <option>Seller / Vendor</option>
-                <option>Tenant</option>
-                <option>Developer</option>
-                <option>Fund / REIT</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Lead Source</label>
-              <select name="leadSource">
-                <option value="">Select…</option>
-                <option>Referral</option>
-                <option>Cold Outreach</option>
-                <option>Inbound Enquiry</option>
-                <option>Networking Event</option>
-                <option>Online Listing</option>
-                <option>Existing Client</option>
-                <option>Social Media</option>
-                <option>Other</option>
-              </select>
+              <label>Dropbox / Photo Link</label>
+              <input type="url" name="photoLink" placeholder="https://dropbox.com/…" />
             </div>
           </div>
         </div>
 
-        <!-- 3. Pitch Details -->
+        <!-- 5. Key Contributors -->
         <div class="form-section">
-          <div class="form-section-title">Pitch Details</div>
+          <div class="form-section-title">Key Contributors</div>
+          <p class="field-hint" style="margin-bottom:1rem">Enter name and optional website URL for each contributor.</p>
 
-          <div class="form-row cols-2">
+          <div class="form-row">
             <div class="form-group">
-              <label>Pitch Date <span class="req">*</span></label>
-              <input type="date" name="pitchDate" required />
-            </div>
-            <div class="form-group">
-              <label>Pitch Method</label>
-              <select name="pitchMethod">
-                <option value="">Select…</option>
-                <option>In-Person Meeting</option>
-                <option>Video Call</option>
-                <option>Phone Call</option>
-                <option>Email Proposal</option>
-                <option>Formal Presentation</option>
-                <option>Site Inspection</option>
-              </select>
+              <label>Developer</label>
+              <div class="link-pair">
+                <input type="text" name="developerName" placeholder="Developer name" />
+                <input type="url" name="developerUrl" placeholder="https://developer.com" />
+              </div>
             </div>
           </div>
 
+          <div class="form-row">
+            <div class="form-group">
+              <label>Architect</label>
+              <div class="link-pair">
+                <input type="text" name="architectName" placeholder="Architect name" />
+                <input type="url" name="architectUrl" placeholder="https://architect.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Interior Designer</label>
+              <div class="link-pair">
+                <input type="text" name="designerName" placeholder="Designer name" />
+                <input type="url" name="designerUrl" placeholder="https://designer.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stager</label>
+              <div class="link-pair">
+                <input type="text" name="stagerName" placeholder="Stager name" />
+                <input type="url" name="stagerUrl" placeholder="https://stager.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Seller <span style="color:var(--text-muted);font-size:0.78rem">(if applicable)</span></label>
+              <input type="text" name="seller" placeholder="Seller's name or entity" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Story Angle -->
+        <div class="form-section">
+          <div class="form-section-title">Story Angle</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>What makes this home newsworthy?</label>
+              <textarea name="newsworthy" placeholder="Notable seller, unique architecture, record price, fire resilience, historic significance, celebrity connection…" style="min-height:110px"></textarea>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Agent Quote <span style="color:var(--text-muted);font-size:0.78rem">(optional — leave blank for placeholder)</span></label>
+              <textarea name="agentQuote" placeholder="Paste the listing agent's quote here if available…" style="min-height:80px"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Tracking -->
+        <div class="form-section">
+          <div class="form-section-title">Tracking</div>
           <div class="form-row cols-3">
             <div class="form-group">
-              <label>Status <span class="req">*</span></label>
-              <select name="status" required>
-                <option value="">Select…</option>
-                <option>Pending</option>
+              <label>Status</label>
+              <select name="status">
+                <option value="Pending">Pending</option>
                 <option>Pitched</option>
                 <option>Follow-Up</option>
-                <option>Negotiating</option>
-                <option>Closed – Won</option>
-                <option>Closed – Lost</option>
+                <option>Placed</option>
+                <option>Declined</option>
                 <option>On Hold</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Priority</label>
-              <select name="priority">
-                <option value="">Select…</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
+              <label>Pitch Date</label>
+              <input type="date" name="pitchDate" />
             </div>
             <div class="form-group">
               <label>Next Follow-Up Date</label>
               <input type="date" name="followUpDate" />
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Commission / Fee (estimated)</label>
-              <input type="text" name="commission" placeholder="e.g. 2% or $50,000" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Pitch Summary / Talking Points</label>
-              <textarea name="pitchSummary" placeholder="Key angles used, objections raised, feedback received…"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Notes -->
-        <div class="form-section">
-          <div class="form-section-title">Additional Notes</div>
           <div class="form-row">
             <div class="form-group">
               <label>Internal Notes</label>
-              <textarea name="notes" placeholder="Any internal context, team notes, or next steps…" style="min-height:100px"></textarea>
+              <textarea name="notes" placeholder="Outlets targeted, journalist contacts, any other context…" style="min-height:70px"></textarea>
             </div>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Pitch</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Generate &amp; Save Pitch</button>
           <button type="button" class="btn btn-secondary" id="clearFormBtn">Clear Form</button>
         </div>
 
@@ -256,35 +274,16 @@
   <div class="tab-panel" id="tab-tracker">
 
     <div class="tracker-toolbar">
-      <input class="search-input" type="text" id="searchInput" placeholder="Search by property, client, location…" />
+      <input class="search-input" type="text" id="searchInput" placeholder="Search by address, agent, seller…" />
       <div class="filter-group">
         <select class="filter-select" id="statusFilter">
           <option value="">All Statuses</option>
           <option>Pending</option>
           <option>Pitched</option>
           <option>Follow-Up</option>
-          <option>Negotiating</option>
-          <option>Closed – Won</option>
-          <option>Closed – Lost</option>
+          <option>Placed</option>
+          <option>Declined</option>
           <option>On Hold</option>
-        </select>
-        <select class="filter-select" id="typeFilter">
-          <option value="">All Types</option>
-          <option>Residential – Apartment</option>
-          <option>Residential – House</option>
-          <option>Commercial – Office</option>
-          <option>Commercial – Retail</option>
-          <option>Commercial – Warehouse / Industrial</option>
-          <option>Mixed-Use</option>
-          <option>Land / Development Site</option>
-          <option>Hospitality</option>
-          <option>Other</option>
-        </select>
-        <select class="filter-select" id="priorityFilter">
-          <option value="">All Priorities</option>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
         </select>
         <button class="btn btn-secondary btn-sm" id="exportCsvBtn">⬇ Export CSV</button>
       </div>
@@ -295,14 +294,14 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Client</th>
-            <th>Asking Price</th>
+            <th>Address</th>
+            <th>Listing Agent(s)</th>
+            <th>Price</th>
+            <th>Photographer</th>
+            <th>Developer</th>
+            <th>Architect</th>
             <th>Pitch Date</th>
             <th>Status</th>
-            <th>Priority</th>
             <th>Follow-Up</th>
             <th>Actions</th>
           </tr>
@@ -312,10 +311,25 @@
     </div>
     <div class="empty-state" id="emptyState" style="display:none">
       <div class="empty-icon">🏢</div>
-      <h3>No pitches found</h3>
+      <h3>No pitches yet</h3>
       <p>Add your first pitch using the <strong>New Pitch</strong> tab.</p>
     </div>
 
+  </div>
+</div>
+
+<!-- ── Pitch preview modal ── -->
+<div class="modal-overlay" id="pitchModal" style="align-items:flex-start;padding:2rem 1rem;overflow-y:auto;">
+  <div class="modal" style="max-width:780px;width:100%;">
+    <h3 style="margin-bottom:0.35rem" id="pitchModalTitle">Media Pitch</h3>
+    <p style="margin-bottom:1rem;font-size:0.8rem;color:var(--text-muted)">
+      Review the generated pitch below. Fields marked in <span style="color:var(--warning)">amber</span> need to be filled in before sending.
+    </p>
+    <div class="pitch-output" id="pitchOutput"></div>
+    <div class="pitch-actions">
+      <button class="btn btn-primary" id="copyPitchBtn">Copy Pitch</button>
+      <button class="btn btn-secondary" id="closePitchModal">Close</button>
+    </div>
   </div>
 </div>
 
@@ -346,15 +360,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ─── Storage helpers ─── */
+/* ─── Storage ─── */
 const STORE_KEY = 'propertyPitches';
-
-function load() {
-  return JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-}
-function save(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
-}
+function load() { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+function save(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
 
 /* ─── Toast ─── */
 function showToast(msg, isError = false) {
@@ -376,58 +385,161 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-/* ─── Status pill helper ─── */
-function statusPill(s) {
-  const map = {
-    'Pending': 'pill-pending',
-    'Pitched': 'pill-pitched',
-    'Follow-Up': 'pill-followup',
-    'Negotiating': 'pill-negotiating',
-    'Closed – Won': 'pill-won',
-    'Closed – Lost': 'pill-lost',
-    'On Hold': 'pill-pending',
-  };
-  return `<span class="pill ${map[s] || ''}">${s || '—'}</span>`;
+/* ─── Multiple agents ─── */
+function removeAgent(btn) {
+  const rows = document.querySelectorAll('#agentList .agent-row');
+  if (rows.length === 1) return;
+  btn.closest('.agent-row').remove();
 }
+document.getElementById('addAgentBtn').addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'agent-row';
+  row.innerHTML = `<input type="text" name="agents" placeholder="Agent name" />
+    <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>`;
+  document.getElementById('agentList').appendChild(row);
+});
 
-function priorityIcon(p) {
-  return p === 'High' ? '🔴' : p === 'Medium' ? '🟡' : p === 'Low' ? '🟢' : '—';
+/* ─── Helpers ─── */
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
 }
-
 function fmt(dateStr) {
   if (!dateStr) return '—';
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
 }
-
 function isOverdue(dateStr) {
   if (!dateStr) return false;
   return new Date(dateStr) < new Date(new Date().toDateString());
 }
+function statusPill(s) {
+  const map = { 'Pending':'pill-pending','Pitched':'pill-pitched','Follow-Up':'pill-followup','Placed':'pill-won','Declined':'pill-lost','On Hold':'pill-pending' };
+  return `<span class="pill ${map[s] || ''}">${s || '—'}</span>`;
+}
+function linkedCell(name, url) {
+  if (!name) return '—';
+  if (url) return `<a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--accent-light);text-decoration:none">${esc(name)} ↗</a>`;
+  return esc(name);
+}
 
-/* ─── Render table ─── */
+/* ─── Abbreviate price for subject line ─── */
+function abbrevPrice(priceStr) {
+  if (!priceStr) return '';
+  const n = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+  if (isNaN(n)) return priceStr;
+  if (n >= 1_000_000) return '$' + (n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 2).replace(/\.?0+$/, '') + 'M';
+  if (n >= 1_000) return '$' + (n / 1_000).toFixed(0) + 'K';
+  return '$' + n;
+}
+
+/* ─── Generate pitch text ─── */
+function generatePitch(p) {
+  const agents = (p.agents || []).filter(Boolean);
+  const agentStr = agents.join(' and ') || '[AGENT NAME]';
+  const priceAbbrev = abbrevPrice(p.price) || '[PRICE]';
+  const priceDisplay = p.price || '[PRICE]';
+
+  // Build subject line (≤50 chars, best effort)
+  let subjectHook = '';
+  if (p.seller) subjectHook = p.seller + "'s ";
+  else if (p.developerName) subjectHook = p.developerName + ' ';
+  else if (p.architectName) subjectHook = p.architectName + '-Designed ';
+
+  // Extract city from address for subject
+  const addrParts = (p.address || '').split(',');
+  const cityState = addrParts.length > 1 ? addrParts.slice(1).join(',').trim() : (p.state || '');
+  const shortCity = cityState.split(',')[0].trim();
+
+  let subjectLine = `${subjectHook}${shortCity} Property Lists ${priceAbbrev}`;
+  if (subjectLine.length > 50) subjectLine = subjectLine.substring(0, 47) + '…';
+
+  // Contributors block
+  const contribs = [];
+  if (p.developerName) contribs.push(`Developer: ${p.developerName}${p.developerUrl ? ' (' + p.developerUrl + ')' : ''}`);
+  if (p.architectName) contribs.push(`Architect: ${p.architectName}${p.architectUrl ? ' (' + p.architectUrl + ')' : ''}`);
+  if (p.designerName) contribs.push(`Interior Designer: ${p.designerName}${p.designerUrl ? ' (' + p.designerUrl + ')' : ''}`);
+  if (p.stagerName) contribs.push(`Stager: ${p.stagerName}${p.stagerUrl ? ' (' + p.stagerUrl + ')' : ''}`);
+
+  // Build opening paragraph from newsworthy angle + seller
+  let openPara = '';
+  if (p.newsworthy) {
+    openPara = p.newsworthy.trim();
+    if (!openPara.endsWith('.')) openPara += '.';
+  } else {
+    openPara = `[OPENING PARAGRAPH — describe the property's strongest story angle. Reference the seller${p.seller ? ' (' + p.seller + ')' : ''}, the architecture${p.architectName ? ' (' + p.architectName + ')' : ''}, or the market context that makes this listing editorially compelling.]`;
+  }
+
+  // Quote block
+  let quoteBlock = '';
+  if (p.agentQuote && p.agentQuote.trim()) {
+    quoteBlock = `"${p.agentQuote.trim()}" — ${agentStr}, Douglas Elliman`;
+  } else {
+    quoteBlock = `[QUOTE — ${agentStr}] — ${agentStr}, Douglas Elliman`;
+  }
+
+  // Photo credit line
+  const photoLine = p.photographer
+    ? `Photos by ${p.photographer}: ${p.photoLink || '[DROPBOX LINK TBD]'}`
+    : `Photos by [PHOTOGRAPHER CREDIT TBD]: ${p.photoLink || '[DROPBOX LINK TBD]'}`;
+
+  // Listing line
+  const listingLine = p.listingUrl || '[DOUGLAS ELLIMAN LISTING URL TBD]';
+
+  // MLS block
+  const mlsBlock = p.mlsDescription
+    ? p.mlsDescription.trim()
+    : '[MLS PROPERTY DESCRIPTION — paste verbatim listing copy here before sending]';
+
+  // Closing attribution sentence
+  const closingSentence = `${p.address || '[ADDRESS]'} is listed at ${priceDisplay} with ${agentStr} at Douglas Elliman.`;
+
+  const lines = [
+    `${(p.state || '[STATE]').toUpperCase()} | ${(p.launchMonth || '[MONTH]').toUpperCase()} | ${p.address || '[ADDRESS]'}`,
+    ``,
+    `SUBJECT: ${subjectLine}`,
+    ``,
+    `Hi [Journalist Name],`,
+    ``,
+    openPara,
+    ``,
+    contribs.length > 0 ? `[Develop the narrative around the property's architecture, design credentials, and distinctive features. Key contributors include: ${contribs.join('; ')}.]` : `[Develop the narrative — describe the property's architecture, scale, materials, and distinctive design elements. Be specific.]`,
+    ``,
+    `[Market context paragraph — explain what this listing represents in the current market. Reference the price point relative to comps, the neighborhood story, or the broader trend this property illustrates.]`,
+    ``,
+    closingSentence,
+    ``,
+    quoteBlock,
+    ``,
+    `Listing: ${listingLine}`,
+    `Listed With: ${agentStr}, Douglas Elliman`,
+    `Price: ${priceDisplay}`,
+    photoLine,
+    ``,
+    `Property Description: ${mlsBlock}`,
+  ];
+
+  return lines.join('\n');
+}
+
+/* ─── Render tracker ─── */
 function renderTable() {
   let data = load();
   const search = document.getElementById('searchInput').value.toLowerCase();
   const statusF = document.getElementById('statusFilter').value;
-  const typeF = document.getElementById('typeFilter').value;
-  const priorityF = document.getElementById('priorityFilter').value;
 
   if (search) {
     data = data.filter(p =>
-      (p.propertyName || '').toLowerCase().includes(search) ||
-      (p.clientName || '').toLowerCase().includes(search) ||
-      (p.location || '').toLowerCase().includes(search) ||
-      (p.company || '').toLowerCase().includes(search)
+      (p.address || '').toLowerCase().includes(search) ||
+      (p.agents || []).some(a => a.toLowerCase().includes(search)) ||
+      (p.seller || '').toLowerCase().includes(search) ||
+      (p.photographer || '').toLowerCase().includes(search)
     );
   }
   if (statusF) data = data.filter(p => p.status === statusF);
-  if (typeF) data = data.filter(p => p.propertyType === typeF);
-  if (priorityF) data = data.filter(p => p.priority === priorityF);
 
-  const allData = load();
-  document.getElementById('trackerCount').textContent = allData.length;
-
+  document.getElementById('trackerCount').textContent = load().length;
   const tbody = document.getElementById('pitchTableBody');
   const empty = document.getElementById('emptyState');
 
@@ -439,24 +551,23 @@ function renderTable() {
   empty.style.display = 'none';
 
   tbody.innerHTML = data.map((p, i) => {
-    const overdue = isOverdue(p.followUpDate) && !['Closed – Won','Closed – Lost'].includes(p.status);
+    const overdue = isOverdue(p.followUpDate) && !['Placed','Declined'].includes(p.status);
+    const agentsList = (p.agents || []).filter(Boolean).join(', ') || '—';
     return `
     <tr>
       <td style="color:var(--text-muted)">${i + 1}</td>
-      <td><strong>${esc(p.propertyName)}</strong></td>
-      <td style="color:var(--text-muted);font-size:0.8rem">${esc(p.propertyType || '—')}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.location || '—')}</td>
-      <td>
-        <div>${esc(p.clientName)}</div>
-        ${p.company ? `<div style="font-size:0.75rem;color:var(--text-muted)">${esc(p.company)}</div>` : ''}
-      </td>
-      <td>${esc(p.askingPrice || '—')}</td>
+      <td style="max-width:160px"><strong>${esc(p.address)}</strong></td>
+      <td style="max-width:160px;font-size:0.82rem">${esc(agentsList)}</td>
+      <td>${esc(p.price || '—')}</td>
+      <td style="font-size:0.82rem">${esc(p.photographer || '—')}</td>
+      <td style="font-size:0.82rem">${linkedCell(p.developerName, p.developerUrl)}</td>
+      <td style="font-size:0.82rem">${linkedCell(p.architectName, p.architectUrl)}</td>
       <td>${fmt(p.pitchDate)}</td>
       <td>${statusPill(p.status)}</td>
-      <td>${priorityIcon(p.priority)} ${p.priority || '—'}</td>
       <td style="color:${overdue ? 'var(--danger)' : 'inherit'}">${fmt(p.followUpDate)}${overdue ? ' ⚠' : ''}</td>
       <td>
         <div class="td-actions">
+          <button class="btn btn-primary btn-sm" onclick="viewPitch('${p.id}')">View Pitch</button>
           <button class="btn btn-secondary btn-sm" onclick="openEdit('${p.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="openDelete('${p.id}')">Del</button>
         </div>
@@ -465,63 +576,131 @@ function renderTable() {
   }).join('');
 }
 
-function esc(str) {
-  const d = document.createElement('div');
-  d.textContent = str || '';
-  return d.innerHTML;
-}
-
-/* ─── Filter/search listeners ─── */
-['searchInput','statusFilter','typeFilter','priorityFilter'].forEach(id => {
+['searchInput','statusFilter'].forEach(id => {
   document.getElementById(id).addEventListener('input', renderTable);
 });
 
-/* ─── Intake form submit ─── */
-document.getElementById('pitchForm').addEventListener('submit', e => {
+/* ─── Intake submit ─── */
+document.getElementById('pitchForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.target;
+  const agentInputs = [...form.querySelectorAll('[name="agents"]')].map(i => i.value.trim()).filter(Boolean);
+
   const fd = new FormData(form);
   const entry = {};
-  fd.forEach((v, k) => { entry[k] = v.trim(); });
+  for (const [k, v] of fd.entries()) {
+    if (k !== 'agents') entry[k] = v.trim();
+  }
+  entry.agents = agentInputs;
 
-  if (!entry.propertyName || !entry.clientName || !entry.pitchDate || !entry.status || !entry.propertyType || !entry.location) {
-    showToast('Please fill in all required fields.', true);
+  if (!entry.address || !entry.price || !entry.state || !entry.launchMonth || !entry.mlsDescription || agentInputs.length === 0) {
+    showToast('Address, Price, State, Launch Month, MLS Description, and at least one Agent are required.', true);
     return;
   }
 
-  entry.id = Date.now().toString();
-  entry.createdAt = new Date().toISOString();
+  // Loading state
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Generating pitch…';
 
-  const data = load();
-  data.unshift(entry);
-  save(data);
+  try {
+    const response = await fetch('/api/generate-pitch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    });
 
-  form.reset();
-  showToast('✅ Pitch saved successfully!');
-  document.getElementById('trackerCount').textContent = data.length;
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to generate pitch.');
+    }
+
+    entry.id = Date.now().toString();
+    entry.createdAt = new Date().toISOString();
+    entry.generatedPitch = result.pitch;
+
+    const data = load();
+    data.unshift(entry);
+    save(data);
+
+    // Reset form
+    form.reset();
+    document.getElementById('agentList').innerHTML = `
+      <div class="agent-row">
+        <input type="text" name="agents" placeholder="Agent name" required />
+        <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
+      </div>`;
+
+    showToast('✅ Pitch generated and saved!');
+    document.getElementById('trackerCount').textContent = data.length;
+    showPitchModal(entry);
+
+  } catch (err) {
+    showToast(err.message || 'Something went wrong. Please try again.', true);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Generate & Save Pitch';
+  }
 });
 
 document.getElementById('clearFormBtn').addEventListener('click', () => {
   document.getElementById('pitchForm').reset();
+  document.getElementById('agentList').innerHTML = `
+    <div class="agent-row">
+      <input type="text" name="agents" placeholder="Agent name" required />
+      <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
+    </div>`;
+});
+
+/* ─── Pitch modal ─── */
+function showPitchModal(p) {
+  const text = p.generatedPitch || generatePitch(p);
+  document.getElementById('pitchModalTitle').textContent = p.address || 'Media Pitch';
+
+  // Highlight placeholders in amber
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const highlighted = escaped.replace(/\[([^\]]+)\]/g, '<span style="color:var(--warning);font-style:italic">[$1]</span>');
+
+  document.getElementById('pitchOutput').innerHTML = highlighted;
+  document.getElementById('pitchModal').classList.add('open');
+}
+
+function viewPitch(id) {
+  const p = load().find(p => p.id === id);
+  if (p) showPitchModal(p);
+}
+
+document.getElementById('closePitchModal').addEventListener('click', () => {
+  document.getElementById('pitchModal').classList.remove('open');
+});
+
+document.getElementById('copyPitchBtn').addEventListener('click', () => {
+  const p = load().find(p => document.getElementById('pitchModalTitle').textContent === p.address);
+  const text = p ? (p.generatedPitch || generatePitch(p)) : document.getElementById('pitchOutput').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Pitch copied to clipboard!')).catch(() => showToast('Copy failed — select and copy manually.', true));
+});
+
+// Close modals on overlay click
+['pitchModal','deleteModal','editModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
 });
 
 /* ─── Delete ─── */
 let pendingDeleteId = null;
-
 function openDelete(id) {
   pendingDeleteId = id;
   document.getElementById('deleteModal').classList.add('open');
 }
-
 document.getElementById('cancelDelete').addEventListener('click', () => {
   document.getElementById('deleteModal').classList.remove('open');
   pendingDeleteId = null;
 });
-
 document.getElementById('confirmDelete').addEventListener('click', () => {
   if (!pendingDeleteId) return;
-  let data = load().filter(p => p.id !== pendingDeleteId);
-  save(data);
+  save(load().filter(p => p.id !== pendingDeleteId));
   document.getElementById('deleteModal').classList.remove('open');
   pendingDeleteId = null;
   renderTable();
@@ -530,48 +709,109 @@ document.getElementById('confirmDelete').addEventListener('click', () => {
 
 /* ─── Edit ─── */
 let editingId = null;
-
 function openEdit(id) {
-  const data = load();
-  const pitch = data.find(p => p.id === id);
+  const pitch = load().find(p => p.id === id);
   if (!pitch) return;
   editingId = id;
 
-  const fields = [
-    { name: 'propertyName', label: 'Property Name', type: 'text', required: true },
-    { name: 'propertyType', label: 'Property Type', type: 'select', options: ['Residential – Apartment','Residential – House','Commercial – Office','Commercial – Retail','Commercial – Warehouse / Industrial','Mixed-Use','Land / Development Site','Hospitality','Other'] },
-    { name: 'location', label: 'Location', type: 'text', required: true },
-    { name: 'askingPrice', label: 'Asking Price', type: 'text' },
-    { name: 'clientName', label: 'Client Name', type: 'text', required: true },
-    { name: 'company', label: 'Company', type: 'text' },
-    { name: 'clientEmail', label: 'Email', type: 'email' },
-    { name: 'clientPhone', label: 'Phone', type: 'tel' },
-    { name: 'pitchDate', label: 'Pitch Date', type: 'date', required: true },
-    { name: 'status', label: 'Status', type: 'select', options: ['Pending','Pitched','Follow-Up','Negotiating','Closed – Won','Closed – Lost','On Hold'], required: true },
-    { name: 'priority', label: 'Priority', type: 'select', options: ['High','Medium','Low'] },
-    { name: 'followUpDate', label: 'Follow-Up Date', type: 'date' },
-    { name: 'commission', label: 'Commission / Fee', type: 'text' },
-    { name: 'notes', label: 'Internal Notes', type: 'textarea' },
-  ];
-
-  const form = document.getElementById('editForm');
-  form.innerHTML = fields.map(f => {
-    const val = pitch[f.name] || '';
-    let input;
-    if (f.type === 'select') {
-      input = `<select name="${f.name}">${f.options.map(o =>
-        `<option ${o === val ? 'selected' : ''}>${o}</option>`
-      ).join('')}</select>`;
-    } else if (f.type === 'textarea') {
-      input = `<textarea name="${f.name}" style="min-height:70px">${val}</textarea>`;
-    } else {
-      input = `<input type="${f.type}" name="${f.name}" value="${esc(val)}" ${f.required ? 'required' : ''} />`;
-    }
-    return `<div class="form-group" style="margin-bottom:0.85rem">
-      <label>${f.label}${f.required ? ' <span class="req">*</span>' : ''}</label>
-      ${input}
+  document.getElementById('editForm').innerHTML = `
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>State <span class="req">*</span></label>
+      <input type="text" name="state" value="${esc(pitch.state||'')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Launch Month <span class="req">*</span></label>
+      <input type="text" name="launchMonth" value="${esc(pitch.launchMonth||'')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Address <span class="req">*</span></label>
+      <input type="text" name="address" value="${esc(pitch.address||'')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Price <span class="req">*</span></label>
+      <input type="text" name="price" value="${esc(pitch.price||'')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Listing URL</label>
+      <input type="url" name="listingUrl" value="${esc(pitch.listingUrl||'')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>MLS Description <span class="req">*</span></label>
+      <textarea name="mlsDescription" style="min-height:100px">${esc(pitch.mlsDescription||'')}</textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Listing Agent(s) <span class="req">*</span> <span style="font-size:0.75rem;color:var(--text-muted)">(one per line)</span></label>
+      <textarea name="agentsText" style="min-height:60px">${esc((pitch.agents||[]).join('\n'))}</textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Photographer</label>
+      <input type="text" name="photographer" value="${esc(pitch.photographer||'')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Dropbox / Photo Link</label>
+      <input type="url" name="photoLink" value="${esc(pitch.photoLink||'')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Developer</label>
+      <div class="link-pair">
+        <input type="text" name="developerName" value="${esc(pitch.developerName||'')}" placeholder="Name" />
+        <input type="url" name="developerUrl" value="${esc(pitch.developerUrl||'')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Architect</label>
+      <div class="link-pair">
+        <input type="text" name="architectName" value="${esc(pitch.architectName||'')}" placeholder="Name" />
+        <input type="url" name="architectUrl" value="${esc(pitch.architectUrl||'')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Interior Designer</label>
+      <div class="link-pair">
+        <input type="text" name="designerName" value="${esc(pitch.designerName||'')}" placeholder="Name" />
+        <input type="url" name="designerUrl" value="${esc(pitch.designerUrl||'')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Stager</label>
+      <div class="link-pair">
+        <input type="text" name="stagerName" value="${esc(pitch.stagerName||'')}" placeholder="Name" />
+        <input type="url" name="stagerUrl" value="${esc(pitch.stagerUrl||'')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Seller</label>
+      <input type="text" name="seller" value="${esc(pitch.seller||'')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>What makes this home newsworthy?</label>
+      <textarea name="newsworthy" style="min-height:80px">${esc(pitch.newsworthy||'')}</textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Agent Quote</label>
+      <textarea name="agentQuote" style="min-height:70px">${esc(pitch.agentQuote||'')}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.85rem">
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          ${['Pending','Pitched','Follow-Up','Placed','Declined','On Hold'].map(o =>
+            `<option ${o === pitch.status ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pitch Date</label>
+        <input type="date" name="pitchDate" value="${pitch.pitchDate||''}" />
+      </div>
+      <div class="form-group">
+        <label>Follow-Up Date</label>
+        <input type="date" name="followUpDate" value="${pitch.followUpDate||''}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Internal Notes</label>
+      <textarea name="notes" style="min-height:60px">${esc(pitch.notes||'')}</textarea>
     </div>`;
-  }).join('');
 
   document.getElementById('editModal').classList.add('open');
 }
@@ -581,23 +821,52 @@ document.getElementById('cancelEdit').addEventListener('click', () => {
   editingId = null;
 });
 
-document.getElementById('saveEdit').addEventListener('click', () => {
+document.getElementById('saveEdit').addEventListener('click', async () => {
   const form = document.getElementById('editForm');
   const fd = new FormData(form);
   const updates = {};
-  fd.forEach((v, k) => { updates[k] = v.trim(); });
+  for (const [k, v] of fd.entries()) updates[k] = v.trim();
 
-  if (!updates.propertyName || !updates.clientName || !updates.pitchDate || !updates.status) {
-    showToast('Please fill in all required fields.', true);
+  if (!updates.address || !updates.price) {
+    showToast('Address and Price are required.', true);
     return;
   }
+  updates.agents = (updates.agentsText || '').split('\n').map(a => a.trim()).filter(Boolean);
+  if (updates.agents.length === 0) {
+    showToast('At least one Listing Agent is required.', true);
+    return;
+  }
+  delete updates.agentsText;
+  updates.updatedAt = new Date().toISOString();
 
-  const data = load().map(p => p.id === editingId ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p);
-  save(data);
-  document.getElementById('editModal').classList.remove('open');
-  editingId = null;
-  renderTable();
-  showToast('✅ Pitch updated.');
+  const saveBtn = document.getElementById('saveEdit');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Regenerating…';
+
+  try {
+    const existing = load().find(p => p.id === editingId) || {};
+    const merged = { ...existing, ...updates };
+
+    const response = await fetch('/api/generate-pitch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(merged),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to regenerate pitch.');
+
+    updates.generatedPitch = result.pitch;
+    save(load().map(p => p.id === editingId ? { ...p, ...updates } : p));
+    document.getElementById('editModal').classList.remove('open');
+    editingId = null;
+    renderTable();
+    showToast('✅ Pitch updated and regenerated.');
+  } catch (err) {
+    showToast(err.message || 'Regeneration failed.', true);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Changes';
+  }
 });
 
 /* ─── Export CSV ─── */
@@ -605,20 +874,22 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
   const data = load();
   if (!data.length) { showToast('Nothing to export.', true); return; }
 
-  const cols = ['propertyName','propertyType','location','askingPrice','propertySize',
-    'clientName','company','clientEmail','clientPhone','clientType','leadSource',
-    'pitchDate','pitchMethod','status','priority','followUpDate','commission','notes'];
+  const cols = ['address','state','launchMonth','price','listingUrl','agents','photographer','photoLink',
+    'developerName','developerUrl','architectName','architectUrl',
+    'designerName','designerUrl','stagerName','stagerUrl',
+    'seller','newsworthy','agentQuote','status','pitchDate','followUpDate','notes'];
 
   const header = cols.join(',');
-  const rows = data.map(p => cols.map(c => `"${(p[c] || '').replace(/"/g,'""')}"`).join(','));
-  const csv = [header, ...rows].join('\n');
+  const rows = data.map(p => cols.map(c => {
+    const val = c === 'agents' ? (p.agents || []).join('; ') : (p[c] || '');
+    return `"${val.replace(/"/g,'""')}"`;
+  }).join(','));
 
+  const csv = [header, ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'property-pitches.csv';
-  a.click();
+  a.href = url; a.download = 'property-pitches.csv'; a.click();
   URL.revokeObjectURL(url);
 });
 
