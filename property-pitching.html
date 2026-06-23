@@ -5,6 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Property Pitching – Activity Hub</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Agent rows */
+    .agent-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .agent-row input { flex: 1; margin-bottom: 0; }
+    .btn-remove-agent {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      width: 32px; height: 32px;
+      cursor: pointer;
+      font-size: 1rem;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .btn-remove-agent:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-add-agent {
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      margin-top: 0.25rem;
+    }
+    .btn-add-agent:hover { border-color: var(--accent); color: var(--accent-light); }
+
+    /* Linked field pair */
+    .link-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .link-pair input:last-child { color: var(--accent-light); }
+
+    .field-hint {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -32,213 +77,138 @@
   <!-- ──────────────── INTAKE FORM ──────────────── -->
   <div class="tab-panel active" id="tab-intake">
     <div class="form-card">
-
       <form id="pitchForm" novalidate>
 
-        <!-- 1. Property Details -->
+        <!-- 1. Property Info -->
         <div class="form-section">
-          <div class="form-section-title">Property Details</div>
+          <div class="form-section-title">Property Info</div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Property Name / Listing Title <span class="req">*</span></label>
-              <input type="text" name="propertyName" placeholder="e.g. The Meridian Office Tower" required />
+              <label>Address <span class="req">*</span></label>
+              <input type="text" name="address" placeholder="Street address, City, State, Zip" required />
             </div>
           </div>
 
           <div class="form-row cols-2">
             <div class="form-group">
-              <label>Property Type <span class="req">*</span></label>
-              <select name="propertyType" required>
-                <option value="">Select type…</option>
-                <option>Residential – Apartment</option>
-                <option>Residential – House</option>
-                <option>Commercial – Office</option>
-                <option>Commercial – Retail</option>
-                <option>Commercial – Warehouse / Industrial</option>
-                <option>Mixed-Use</option>
-                <option>Land / Development Site</option>
-                <option>Hospitality</option>
-                <option>Other</option>
-              </select>
+              <label>Price <span class="req">*</span></label>
+              <input type="text" name="price" placeholder="e.g. $2,500,000" required />
             </div>
             <div class="form-group">
-              <label>Location / Address <span class="req">*</span></label>
-              <input type="text" name="location" placeholder="Street, City, State" required />
+              <label>Photos by (Photographer)</label>
+              <input type="text" name="photographer" placeholder="Photographer's name" />
             </div>
           </div>
+        </div>
 
-          <div class="form-row cols-3">
-            <div class="form-group">
-              <label>Asking Price / Budget</label>
-              <input type="text" name="askingPrice" placeholder="e.g. $2,500,000" />
-            </div>
-            <div class="form-group">
-              <label>Property Size</label>
-              <input type="text" name="propertySize" placeholder="e.g. 1,200 sqm" />
-            </div>
-            <div class="form-group">
-              <label>Year Built</label>
-              <input type="text" name="yearBuilt" placeholder="e.g. 2018" />
+        <!-- 2. Listing Agents -->
+        <div class="form-section">
+          <div class="form-section-title">Listing Agent(s) <span class="req">*</span></div>
+          <div id="agentList">
+            <div class="agent-row">
+              <input type="text" name="agents" placeholder="Agent name" required />
+              <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
             </div>
           </div>
+          <button type="button" class="btn-add-agent" id="addAgentBtn">+ Add another agent</button>
+        </div>
 
-          <div class="form-row cols-2">
+        <!-- 3. Key Contributors -->
+        <div class="form-section">
+          <div class="form-section-title">Key Contributors</div>
+          <p class="field-hint" style="margin-bottom:1rem">Enter the name and optionally a website URL for each contributor.</p>
+
+          <div class="form-row">
             <div class="form-group">
-              <label>Zoning / Use Class</label>
-              <input type="text" name="zoning" placeholder="e.g. B1 – Business, R2 – Low Density" />
-            </div>
-            <div class="form-group">
-              <label>Tenancy Status</label>
-              <select name="tenancyStatus">
-                <option value="">Select…</option>
-                <option>Vacant</option>
-                <option>Owner-Occupied</option>
-                <option>Fully Tenanted</option>
-                <option>Partially Tenanted</option>
-              </select>
+              <label>Developer</label>
+              <div class="link-pair">
+                <input type="text" name="developerName" placeholder="Developer name" />
+                <input type="url" name="developerUrl" placeholder="https://developer.com" />
+              </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Key Features / Highlights</label>
-              <textarea name="keyFeatures" placeholder="Corner lot, sea views, recently renovated lobby, EV charging…"></textarea>
+              <label>Architect</label>
+              <div class="link-pair">
+                <input type="text" name="architectName" placeholder="Architect name" />
+                <input type="url" name="architectUrl" placeholder="https://architect.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Interior Designer</label>
+              <div class="link-pair">
+                <input type="text" name="designerName" placeholder="Designer name" />
+                <input type="url" name="designerUrl" placeholder="https://designer.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stager</label>
+              <div class="link-pair">
+                <input type="text" name="stagerName" placeholder="Stager name" />
+                <input type="url" name="stagerUrl" placeholder="https://stager.com" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Seller <span style="color:var(--text-muted);font-size:0.78rem">(if applicable)</span></label>
+              <input type="text" name="seller" placeholder="Seller's name or entity" />
             </div>
           </div>
         </div>
 
-        <!-- 2. Client / Contact -->
-        <div class="form-section">
-          <div class="form-section-title">Client / Contact</div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Client / Contact Name <span class="req">*</span></label>
-              <input type="text" name="clientName" placeholder="Full name" required />
-            </div>
-            <div class="form-group">
-              <label>Company / Organisation</label>
-              <input type="text" name="company" placeholder="Company name" />
-            </div>
-          </div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" name="clientEmail" placeholder="contact@example.com" />
-            </div>
-            <div class="form-group">
-              <label>Phone</label>
-              <input type="tel" name="clientPhone" placeholder="+1 555 000 0000" />
-            </div>
-          </div>
-
-          <div class="form-row cols-2">
-            <div class="form-group">
-              <label>Client Type</label>
-              <select name="clientType">
-                <option value="">Select…</option>
-                <option>Buyer – Owner-Occupier</option>
-                <option>Buyer – Investor</option>
-                <option>Seller / Vendor</option>
-                <option>Tenant</option>
-                <option>Developer</option>
-                <option>Fund / REIT</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Lead Source</label>
-              <select name="leadSource">
-                <option value="">Select…</option>
-                <option>Referral</option>
-                <option>Cold Outreach</option>
-                <option>Inbound Enquiry</option>
-                <option>Networking Event</option>
-                <option>Online Listing</option>
-                <option>Existing Client</option>
-                <option>Social Media</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Pitch Details -->
+        <!-- 4. Pitch Details -->
         <div class="form-section">
           <div class="form-section-title">Pitch Details</div>
 
-          <div class="form-row cols-2">
+          <div class="form-row">
             <div class="form-group">
-              <label>Pitch Date <span class="req">*</span></label>
-              <input type="date" name="pitchDate" required />
-            </div>
-            <div class="form-group">
-              <label>Pitch Method</label>
-              <select name="pitchMethod">
-                <option value="">Select…</option>
-                <option>In-Person Meeting</option>
-                <option>Video Call</option>
-                <option>Phone Call</option>
-                <option>Email Proposal</option>
-                <option>Formal Presentation</option>
-                <option>Site Inspection</option>
-              </select>
+              <label>What makes this home newsworthy?</label>
+              <textarea name="newsworthy" placeholder="Unique architecture, record price, celebrity connection, historic significance…" style="min-height:110px"></textarea>
             </div>
           </div>
 
           <div class="form-row cols-3">
             <div class="form-group">
-              <label>Status <span class="req">*</span></label>
-              <select name="status" required>
+              <label>Status</label>
+              <select name="status">
                 <option value="">Select…</option>
                 <option>Pending</option>
                 <option>Pitched</option>
                 <option>Follow-Up</option>
-                <option>Negotiating</option>
-                <option>Closed – Won</option>
-                <option>Closed – Lost</option>
+                <option>Placed</option>
+                <option>Declined</option>
                 <option>On Hold</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Priority</label>
-              <select name="priority">
-                <option value="">Select…</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-              </select>
+              <label>Pitch Date</label>
+              <input type="date" name="pitchDate" />
             </div>
             <div class="form-group">
               <label>Next Follow-Up Date</label>
               <input type="date" name="followUpDate" />
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Commission / Fee (estimated)</label>
-              <input type="text" name="commission" placeholder="e.g. 2% or $50,000" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Pitch Summary / Talking Points</label>
-              <textarea name="pitchSummary" placeholder="Key angles used, objections raised, feedback received…"></textarea>
-            </div>
-          </div>
         </div>
 
-        <!-- 4. Notes -->
+        <!-- 5. Notes -->
         <div class="form-section">
           <div class="form-section-title">Additional Notes</div>
           <div class="form-row">
             <div class="form-group">
               <label>Internal Notes</label>
-              <textarea name="notes" placeholder="Any internal context, team notes, or next steps…" style="min-height:100px"></textarea>
+              <textarea name="notes" placeholder="Outlets targeted, journalist contacts, any other context…" style="min-height:90px"></textarea>
             </div>
           </div>
         </div>
@@ -256,35 +226,16 @@
   <div class="tab-panel" id="tab-tracker">
 
     <div class="tracker-toolbar">
-      <input class="search-input" type="text" id="searchInput" placeholder="Search by property, client, location…" />
+      <input class="search-input" type="text" id="searchInput" placeholder="Search by address, agent, seller…" />
       <div class="filter-group">
         <select class="filter-select" id="statusFilter">
           <option value="">All Statuses</option>
           <option>Pending</option>
           <option>Pitched</option>
           <option>Follow-Up</option>
-          <option>Negotiating</option>
-          <option>Closed – Won</option>
-          <option>Closed – Lost</option>
+          <option>Placed</option>
+          <option>Declined</option>
           <option>On Hold</option>
-        </select>
-        <select class="filter-select" id="typeFilter">
-          <option value="">All Types</option>
-          <option>Residential – Apartment</option>
-          <option>Residential – House</option>
-          <option>Commercial – Office</option>
-          <option>Commercial – Retail</option>
-          <option>Commercial – Warehouse / Industrial</option>
-          <option>Mixed-Use</option>
-          <option>Land / Development Site</option>
-          <option>Hospitality</option>
-          <option>Other</option>
-        </select>
-        <select class="filter-select" id="priorityFilter">
-          <option value="">All Priorities</option>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
         </select>
         <button class="btn btn-secondary btn-sm" id="exportCsvBtn">⬇ Export CSV</button>
       </div>
@@ -295,14 +246,14 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Client</th>
-            <th>Asking Price</th>
+            <th>Address</th>
+            <th>Listing Agent(s)</th>
+            <th>Price</th>
+            <th>Photographer</th>
+            <th>Developer</th>
+            <th>Architect</th>
             <th>Pitch Date</th>
             <th>Status</th>
-            <th>Priority</th>
             <th>Follow-Up</th>
             <th>Actions</th>
           </tr>
@@ -312,7 +263,7 @@
     </div>
     <div class="empty-state" id="emptyState" style="display:none">
       <div class="empty-icon">🏢</div>
-      <h3>No pitches found</h3>
+      <h3>No pitches yet</h3>
       <p>Add your first pitch using the <strong>New Pitch</strong> tab.</p>
     </div>
 
@@ -346,15 +297,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ─── Storage helpers ─── */
+/* ─── Storage ─── */
 const STORE_KEY = 'propertyPitches';
-
-function load() {
-  return JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-}
-function save(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
-}
+function load() { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+function save(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
 
 /* ─── Toast ─── */
 function showToast(msg, isError = false) {
@@ -376,22 +322,27 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-/* ─── Status pill helper ─── */
-function statusPill(s) {
-  const map = {
-    'Pending': 'pill-pending',
-    'Pitched': 'pill-pitched',
-    'Follow-Up': 'pill-followup',
-    'Negotiating': 'pill-negotiating',
-    'Closed – Won': 'pill-won',
-    'Closed – Lost': 'pill-lost',
-    'On Hold': 'pill-pending',
-  };
-  return `<span class="pill ${map[s] || ''}">${s || '—'}</span>`;
+/* ─── Multiple agents ─── */
+function removeAgent(btn) {
+  const rows = document.querySelectorAll('#agentList .agent-row');
+  if (rows.length === 1) return; // keep at least one
+  btn.closest('.agent-row').remove();
 }
 
-function priorityIcon(p) {
-  return p === 'High' ? '🔴' : p === 'Medium' ? '🟡' : p === 'Low' ? '🟢' : '—';
+document.getElementById('addAgentBtn').addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'agent-row';
+  row.innerHTML = `
+    <input type="text" name="agents" placeholder="Agent name" />
+    <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>`;
+  document.getElementById('agentList').appendChild(row);
+});
+
+/* ─── Helpers ─── */
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
 }
 
 function fmt(dateStr) {
@@ -405,28 +356,41 @@ function isOverdue(dateStr) {
   return new Date(dateStr) < new Date(new Date().toDateString());
 }
 
-/* ─── Render table ─── */
+function statusPill(s) {
+  const map = {
+    'Pending':   'pill-pending',
+    'Pitched':   'pill-pitched',
+    'Follow-Up': 'pill-followup',
+    'Placed':    'pill-won',
+    'Declined':  'pill-lost',
+    'On Hold':   'pill-pending',
+  };
+  return `<span class="pill ${map[s] || ''}">${s || '—'}</span>`;
+}
+
+function linkedCell(name, url) {
+  if (!name) return '—';
+  if (url) return `<a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--accent-light);text-decoration:none">${esc(name)} ↗</a>`;
+  return esc(name);
+}
+
+/* ─── Render tracker ─── */
 function renderTable() {
   let data = load();
   const search = document.getElementById('searchInput').value.toLowerCase();
   const statusF = document.getElementById('statusFilter').value;
-  const typeF = document.getElementById('typeFilter').value;
-  const priorityF = document.getElementById('priorityFilter').value;
 
   if (search) {
     data = data.filter(p =>
-      (p.propertyName || '').toLowerCase().includes(search) ||
-      (p.clientName || '').toLowerCase().includes(search) ||
-      (p.location || '').toLowerCase().includes(search) ||
-      (p.company || '').toLowerCase().includes(search)
+      (p.address || '').toLowerCase().includes(search) ||
+      (p.agents || []).some(a => a.toLowerCase().includes(search)) ||
+      (p.seller || '').toLowerCase().includes(search) ||
+      (p.photographer || '').toLowerCase().includes(search)
     );
   }
   if (statusF) data = data.filter(p => p.status === statusF);
-  if (typeF) data = data.filter(p => p.propertyType === typeF);
-  if (priorityF) data = data.filter(p => p.priority === priorityF);
 
-  const allData = load();
-  document.getElementById('trackerCount').textContent = allData.length;
+  document.getElementById('trackerCount').textContent = load().length;
 
   const tbody = document.getElementById('pitchTableBody');
   const empty = document.getElementById('emptyState');
@@ -439,21 +403,19 @@ function renderTable() {
   empty.style.display = 'none';
 
   tbody.innerHTML = data.map((p, i) => {
-    const overdue = isOverdue(p.followUpDate) && !['Closed – Won','Closed – Lost'].includes(p.status);
+    const overdue = isOverdue(p.followUpDate) && !['Placed','Declined'].includes(p.status);
+    const agentsList = (p.agents || []).filter(Boolean).join(', ') || '—';
     return `
     <tr>
       <td style="color:var(--text-muted)">${i + 1}</td>
-      <td><strong>${esc(p.propertyName)}</strong></td>
-      <td style="color:var(--text-muted);font-size:0.8rem">${esc(p.propertyType || '—')}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.location || '—')}</td>
-      <td>
-        <div>${esc(p.clientName)}</div>
-        ${p.company ? `<div style="font-size:0.75rem;color:var(--text-muted)">${esc(p.company)}</div>` : ''}
-      </td>
-      <td>${esc(p.askingPrice || '—')}</td>
+      <td style="max-width:160px"><strong>${esc(p.address)}</strong></td>
+      <td style="max-width:160px;font-size:0.82rem">${esc(agentsList)}</td>
+      <td>${esc(p.price || '—')}</td>
+      <td style="font-size:0.82rem">${esc(p.photographer || '—')}</td>
+      <td style="font-size:0.82rem">${linkedCell(p.developerName, p.developerUrl)}</td>
+      <td style="font-size:0.82rem">${linkedCell(p.architectName, p.architectUrl)}</td>
       <td>${fmt(p.pitchDate)}</td>
       <td>${statusPill(p.status)}</td>
-      <td>${priorityIcon(p.priority)} ${p.priority || '—'}</td>
       <td style="color:${overdue ? 'var(--danger)' : 'inherit'}">${fmt(p.followUpDate)}${overdue ? ' ⚠' : ''}</td>
       <td>
         <div class="td-actions">
@@ -465,27 +427,28 @@ function renderTable() {
   }).join('');
 }
 
-function esc(str) {
-  const d = document.createElement('div');
-  d.textContent = str || '';
-  return d.innerHTML;
-}
-
-/* ─── Filter/search listeners ─── */
-['searchInput','statusFilter','typeFilter','priorityFilter'].forEach(id => {
+['searchInput','statusFilter'].forEach(id => {
   document.getElementById(id).addEventListener('input', renderTable);
 });
 
-/* ─── Intake form submit ─── */
+/* ─── Intake submit ─── */
 document.getElementById('pitchForm').addEventListener('submit', e => {
   e.preventDefault();
   const form = e.target;
+
+  // Collect multiple agents
+  const agentInputs = [...form.querySelectorAll('[name="agents"]')].map(i => i.value.trim()).filter(Boolean);
+
   const fd = new FormData(form);
   const entry = {};
-  fd.forEach((v, k) => { entry[k] = v.trim(); });
+  // Collect all non-agent fields
+  for (const [k, v] of fd.entries()) {
+    if (k !== 'agents') entry[k] = v.trim();
+  }
+  entry.agents = agentInputs;
 
-  if (!entry.propertyName || !entry.clientName || !entry.pitchDate || !entry.status || !entry.propertyType || !entry.location) {
-    showToast('Please fill in all required fields.', true);
+  if (!entry.address || !entry.price || agentInputs.length === 0) {
+    showToast('Address, Price, and at least one Listing Agent are required.', true);
     return;
   }
 
@@ -497,12 +460,24 @@ document.getElementById('pitchForm').addEventListener('submit', e => {
   save(data);
 
   form.reset();
+  // Reset agent list to single empty row
+  document.getElementById('agentList').innerHTML = `
+    <div class="agent-row">
+      <input type="text" name="agents" placeholder="Agent name" required />
+      <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
+    </div>`;
+
   showToast('✅ Pitch saved successfully!');
   document.getElementById('trackerCount').textContent = data.length;
 });
 
 document.getElementById('clearFormBtn').addEventListener('click', () => {
   document.getElementById('pitchForm').reset();
+  document.getElementById('agentList').innerHTML = `
+    <div class="agent-row">
+      <input type="text" name="agents" placeholder="Agent name" required />
+      <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
+    </div>`;
 });
 
 /* ─── Delete ─── */
@@ -520,8 +495,7 @@ document.getElementById('cancelDelete').addEventListener('click', () => {
 
 document.getElementById('confirmDelete').addEventListener('click', () => {
   if (!pendingDeleteId) return;
-  let data = load().filter(p => p.id !== pendingDeleteId);
-  save(data);
+  save(load().filter(p => p.id !== pendingDeleteId));
   document.getElementById('deleteModal').classList.remove('open');
   pendingDeleteId = null;
   renderTable();
@@ -532,46 +506,86 @@ document.getElementById('confirmDelete').addEventListener('click', () => {
 let editingId = null;
 
 function openEdit(id) {
-  const data = load();
-  const pitch = data.find(p => p.id === id);
+  const pitch = load().find(p => p.id === id);
   if (!pitch) return;
   editingId = id;
 
-  const fields = [
-    { name: 'propertyName', label: 'Property Name', type: 'text', required: true },
-    { name: 'propertyType', label: 'Property Type', type: 'select', options: ['Residential – Apartment','Residential – House','Commercial – Office','Commercial – Retail','Commercial – Warehouse / Industrial','Mixed-Use','Land / Development Site','Hospitality','Other'] },
-    { name: 'location', label: 'Location', type: 'text', required: true },
-    { name: 'askingPrice', label: 'Asking Price', type: 'text' },
-    { name: 'clientName', label: 'Client Name', type: 'text', required: true },
-    { name: 'company', label: 'Company', type: 'text' },
-    { name: 'clientEmail', label: 'Email', type: 'email' },
-    { name: 'clientPhone', label: 'Phone', type: 'tel' },
-    { name: 'pitchDate', label: 'Pitch Date', type: 'date', required: true },
-    { name: 'status', label: 'Status', type: 'select', options: ['Pending','Pitched','Follow-Up','Negotiating','Closed – Won','Closed – Lost','On Hold'], required: true },
-    { name: 'priority', label: 'Priority', type: 'select', options: ['High','Medium','Low'] },
-    { name: 'followUpDate', label: 'Follow-Up Date', type: 'date' },
-    { name: 'commission', label: 'Commission / Fee', type: 'text' },
-    { name: 'notes', label: 'Internal Notes', type: 'textarea' },
-  ];
+  const agentsVal = (pitch.agents || ['']).join('\n');
 
-  const form = document.getElementById('editForm');
-  form.innerHTML = fields.map(f => {
-    const val = pitch[f.name] || '';
-    let input;
-    if (f.type === 'select') {
-      input = `<select name="${f.name}">${f.options.map(o =>
-        `<option ${o === val ? 'selected' : ''}>${o}</option>`
-      ).join('')}</select>`;
-    } else if (f.type === 'textarea') {
-      input = `<textarea name="${f.name}" style="min-height:70px">${val}</textarea>`;
-    } else {
-      input = `<input type="${f.type}" name="${f.name}" value="${esc(val)}" ${f.required ? 'required' : ''} />`;
-    }
-    return `<div class="form-group" style="margin-bottom:0.85rem">
-      <label>${f.label}${f.required ? ' <span class="req">*</span>' : ''}</label>
-      ${input}
+  document.getElementById('editForm').innerHTML = `
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Address <span class="req">*</span></label>
+      <input type="text" name="address" value="${esc(pitch.address || '')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Price <span class="req">*</span></label>
+      <input type="text" name="price" value="${esc(pitch.price || '')}" required />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Listing Agent(s) <span class="req">*</span> <span style="font-size:0.75rem;color:var(--text-muted)">(one per line)</span></label>
+      <textarea name="agentsText" style="min-height:70px">${esc(agentsVal)}</textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Photographer</label>
+      <input type="text" name="photographer" value="${esc(pitch.photographer || '')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Developer</label>
+      <div class="link-pair">
+        <input type="text" name="developerName" value="${esc(pitch.developerName || '')}" placeholder="Name" />
+        <input type="url" name="developerUrl" value="${esc(pitch.developerUrl || '')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Architect</label>
+      <div class="link-pair">
+        <input type="text" name="architectName" value="${esc(pitch.architectName || '')}" placeholder="Name" />
+        <input type="url" name="architectUrl" value="${esc(pitch.architectUrl || '')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Interior Designer</label>
+      <div class="link-pair">
+        <input type="text" name="designerName" value="${esc(pitch.designerName || '')}" placeholder="Name" />
+        <input type="url" name="designerUrl" value="${esc(pitch.designerUrl || '')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Stager</label>
+      <div class="link-pair">
+        <input type="text" name="stagerName" value="${esc(pitch.stagerName || '')}" placeholder="Name" />
+        <input type="url" name="stagerUrl" value="${esc(pitch.stagerUrl || '')}" placeholder="https://" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>Seller</label>
+      <input type="text" name="seller" value="${esc(pitch.seller || '')}" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.85rem">
+      <label>What makes this home newsworthy?</label>
+      <textarea name="newsworthy" style="min-height:80px">${esc(pitch.newsworthy || '')}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:0.85rem">
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          ${['Pending','Pitched','Follow-Up','Placed','Declined','On Hold'].map(o =>
+            `<option ${o === pitch.status ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pitch Date</label>
+        <input type="date" name="pitchDate" value="${pitch.pitchDate || ''}" />
+      </div>
+      <div class="form-group">
+        <label>Follow-Up Date</label>
+        <input type="date" name="followUpDate" value="${pitch.followUpDate || ''}" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Internal Notes</label>
+      <textarea name="notes" style="min-height:70px">${esc(pitch.notes || '')}</textarea>
     </div>`;
-  }).join('');
 
   document.getElementById('editModal').classList.add('open');
 }
@@ -585,15 +599,23 @@ document.getElementById('saveEdit').addEventListener('click', () => {
   const form = document.getElementById('editForm');
   const fd = new FormData(form);
   const updates = {};
-  fd.forEach((v, k) => { updates[k] = v.trim(); });
+  for (const [k, v] of fd.entries()) updates[k] = v.trim();
 
-  if (!updates.propertyName || !updates.clientName || !updates.pitchDate || !updates.status) {
-    showToast('Please fill in all required fields.', true);
+  if (!updates.address || !updates.price) {
+    showToast('Address and Price are required.', true);
     return;
   }
 
-  const data = load().map(p => p.id === editingId ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p);
-  save(data);
+  // Parse agents from textarea (one per line)
+  updates.agents = (updates.agentsText || '').split('\n').map(a => a.trim()).filter(Boolean);
+  if (updates.agents.length === 0) {
+    showToast('At least one Listing Agent is required.', true);
+    return;
+  }
+  delete updates.agentsText;
+  updates.updatedAt = new Date().toISOString();
+
+  save(load().map(p => p.id === editingId ? { ...p, ...updates } : p));
   document.getElementById('editModal').classList.remove('open');
   editingId = null;
   renderTable();
@@ -605,14 +627,18 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
   const data = load();
   if (!data.length) { showToast('Nothing to export.', true); return; }
 
-  const cols = ['propertyName','propertyType','location','askingPrice','propertySize',
-    'clientName','company','clientEmail','clientPhone','clientType','leadSource',
-    'pitchDate','pitchMethod','status','priority','followUpDate','commission','notes'];
+  const cols = ['address','price','agents','photographer',
+    'developerName','developerUrl','architectName','architectUrl',
+    'designerName','designerUrl','stagerName','stagerUrl',
+    'seller','newsworthy','status','pitchDate','followUpDate','notes'];
 
   const header = cols.join(',');
-  const rows = data.map(p => cols.map(c => `"${(p[c] || '').replace(/"/g,'""')}"`).join(','));
-  const csv = [header, ...rows].join('\n');
+  const rows = data.map(p => cols.map(c => {
+    const val = c === 'agents' ? (p.agents || []).join('; ') : (p[c] || '');
+    return `"${val.replace(/"/g,'""')}"`;
+  }).join(','));
 
+  const csv = [header, ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
