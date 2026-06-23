@@ -262,7 +262,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Generate &amp; Save Pitch</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Generate &amp; Save Pitch</button>
           <button type="button" class="btn btn-secondary" id="clearFormBtn">Clear Form</button>
         </div>
 
@@ -581,7 +581,7 @@ function renderTable() {
 });
 
 /* ─── Intake submit ─── */
-document.getElementById('pitchForm').addEventListener('submit', e => {
+document.getElementById('pitchForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.target;
   const agentInputs = [...form.querySelectorAll('[name="agents"]')].map(i => i.value.trim()).filter(Boolean);
@@ -598,27 +598,50 @@ document.getElementById('pitchForm').addEventListener('submit', e => {
     return;
   }
 
-  entry.id = Date.now().toString();
-  entry.createdAt = new Date().toISOString();
-  entry.generatedPitch = generatePitch(entry);
+  // Loading state
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Generating pitch…';
 
-  const data = load();
-  data.unshift(entry);
-  save(data);
+  try {
+    const response = await fetch('/api/generate-pitch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    });
 
-  // Reset form
-  form.reset();
-  document.getElementById('agentList').innerHTML = `
-    <div class="agent-row">
-      <input type="text" name="agents" placeholder="Agent name" required />
-      <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
-    </div>`;
+    const result = await response.json();
 
-  showToast('✅ Pitch generated and saved!');
-  document.getElementById('trackerCount').textContent = data.length;
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to generate pitch.');
+    }
 
-  // Show the generated pitch immediately
-  showPitchModal(entry);
+    entry.id = Date.now().toString();
+    entry.createdAt = new Date().toISOString();
+    entry.generatedPitch = result.pitch;
+
+    const data = load();
+    data.unshift(entry);
+    save(data);
+
+    // Reset form
+    form.reset();
+    document.getElementById('agentList').innerHTML = `
+      <div class="agent-row">
+        <input type="text" name="agents" placeholder="Agent name" required />
+        <button type="button" class="btn-remove-agent" onclick="removeAgent(this)" title="Remove">×</button>
+      </div>`;
+
+    showToast('✅ Pitch generated and saved!');
+    document.getElementById('trackerCount').textContent = data.length;
+    showPitchModal(entry);
+
+  } catch (err) {
+    showToast(err.message || 'Something went wrong. Please try again.', true);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Generate & Save Pitch';
+  }
 });
 
 document.getElementById('clearFormBtn').addEventListener('click', () => {
@@ -798,7 +821,7 @@ document.getElementById('cancelEdit').addEventListener('click', () => {
   editingId = null;
 });
 
-document.getElementById('saveEdit').addEventListener('click', () => {
+document.getElementById('saveEdit').addEventListener('click', async () => {
   const form = document.getElementById('editForm');
   const fd = new FormData(form);
   const updates = {};
@@ -816,16 +839,34 @@ document.getElementById('saveEdit').addEventListener('click', () => {
   delete updates.agentsText;
   updates.updatedAt = new Date().toISOString();
 
-  // Regenerate pitch with updated data
-  const existing = load().find(p => p.id === editingId) || {};
-  const merged = { ...existing, ...updates };
-  updates.generatedPitch = generatePitch(merged);
+  const saveBtn = document.getElementById('saveEdit');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Regenerating…';
 
-  save(load().map(p => p.id === editingId ? { ...p, ...updates } : p));
-  document.getElementById('editModal').classList.remove('open');
-  editingId = null;
-  renderTable();
-  showToast('✅ Pitch updated and regenerated.');
+  try {
+    const existing = load().find(p => p.id === editingId) || {};
+    const merged = { ...existing, ...updates };
+
+    const response = await fetch('/api/generate-pitch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(merged),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to regenerate pitch.');
+
+    updates.generatedPitch = result.pitch;
+    save(load().map(p => p.id === editingId ? { ...p, ...updates } : p));
+    document.getElementById('editModal').classList.remove('open');
+    editingId = null;
+    renderTable();
+    showToast('✅ Pitch updated and regenerated.');
+  } catch (err) {
+    showToast(err.message || 'Regeneration failed.', true);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Changes';
+  }
 });
 
 /* ─── Export CSV ─── */
