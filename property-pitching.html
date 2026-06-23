@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Pitching – Activity Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">⚡ Activity Hub</a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Dashboard</a>
+    <a class="nav-link active" href="property-pitching.html">Property Pitching</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>🏢 Property Pitching</h1>
+    <p>Capture new pitches and track progress across your pipeline.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="intake">New Pitch</button>
+    <button class="tab-btn" data-tab="tracker">
+      Tracker <span class="count-badge" id="trackerCount">0</span>
+    </button>
+  </div>
+
+  <!-- ──────────────── INTAKE FORM ──────────────── -->
+  <div class="tab-panel active" id="tab-intake">
+    <div class="form-card">
+
+      <form id="pitchForm" novalidate>
+
+        <!-- 1. Property Details -->
+        <div class="form-section">
+          <div class="form-section-title">Property Details</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Property Name / Listing Title <span class="req">*</span></label>
+              <input type="text" name="propertyName" placeholder="e.g. The Meridian Office Tower" required />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Property Type <span class="req">*</span></label>
+              <select name="propertyType" required>
+                <option value="">Select type…</option>
+                <option>Residential – Apartment</option>
+                <option>Residential – House</option>
+                <option>Commercial – Office</option>
+                <option>Commercial – Retail</option>
+                <option>Commercial – Warehouse / Industrial</option>
+                <option>Mixed-Use</option>
+                <option>Land / Development Site</option>
+                <option>Hospitality</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Location / Address <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="Street, City, State" required />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label>Asking Price / Budget</label>
+              <input type="text" name="askingPrice" placeholder="e.g. $2,500,000" />
+            </div>
+            <div class="form-group">
+              <label>Property Size</label>
+              <input type="text" name="propertySize" placeholder="e.g. 1,200 sqm" />
+            </div>
+            <div class="form-group">
+              <label>Year Built</label>
+              <input type="text" name="yearBuilt" placeholder="e.g. 2018" />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Zoning / Use Class</label>
+              <input type="text" name="zoning" placeholder="e.g. B1 – Business, R2 – Low Density" />
+            </div>
+            <div class="form-group">
+              <label>Tenancy Status</label>
+              <select name="tenancyStatus">
+                <option value="">Select…</option>
+                <option>Vacant</option>
+                <option>Owner-Occupied</option>
+                <option>Fully Tenanted</option>
+                <option>Partially Tenanted</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Key Features / Highlights</label>
+              <textarea name="keyFeatures" placeholder="Corner lot, sea views, recently renovated lobby, EV charging…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Client / Contact -->
+        <div class="form-section">
+          <div class="form-section-title">Client / Contact</div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Client / Contact Name <span class="req">*</span></label>
+              <input type="text" name="clientName" placeholder="Full name" required />
+            </div>
+            <div class="form-group">
+              <label>Company / Organisation</label>
+              <input type="text" name="company" placeholder="Company name" />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="clientEmail" placeholder="contact@example.com" />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" name="clientPhone" placeholder="+1 555 000 0000" />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Client Type</label>
+              <select name="clientType">
+                <option value="">Select…</option>
+                <option>Buyer – Owner-Occupier</option>
+                <option>Buyer – Investor</option>
+                <option>Seller / Vendor</option>
+                <option>Tenant</option>
+                <option>Developer</option>
+                <option>Fund / REIT</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Lead Source</label>
+              <select name="leadSource">
+                <option value="">Select…</option>
+                <option>Referral</option>
+                <option>Cold Outreach</option>
+                <option>Inbound Enquiry</option>
+                <option>Networking Event</option>
+                <option>Online Listing</option>
+                <option>Existing Client</option>
+                <option>Social Media</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Pitch Details -->
+        <div class="form-section">
+          <div class="form-section-title">Pitch Details</div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label>Pitch Date <span class="req">*</span></label>
+              <input type="date" name="pitchDate" required />
+            </div>
+            <div class="form-group">
+              <label>Pitch Method</label>
+              <select name="pitchMethod">
+                <option value="">Select…</option>
+                <option>In-Person Meeting</option>
+                <option>Video Call</option>
+                <option>Phone Call</option>
+                <option>Email Proposal</option>
+                <option>Formal Presentation</option>
+                <option>Site Inspection</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label>Status <span class="req">*</span></label>
+              <select name="status" required>
+                <option value="">Select…</option>
+                <option>Pending</option>
+                <option>Pitched</option>
+                <option>Follow-Up</option>
+                <option>Negotiating</option>
+                <option>Closed – Won</option>
+                <option>Closed – Lost</option>
+                <option>On Hold</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select name="priority">
+                <option value="">Select…</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Next Follow-Up Date</label>
+              <input type="date" name="followUpDate" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Commission / Fee (estimated)</label>
+              <input type="text" name="commission" placeholder="e.g. 2% or $50,000" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pitch Summary / Talking Points</label>
+              <textarea name="pitchSummary" placeholder="Key angles used, objections raised, feedback received…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Notes -->
+        <div class="form-section">
+          <div class="form-section-title">Additional Notes</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Internal Notes</label>
+              <textarea name="notes" placeholder="Any internal context, team notes, or next steps…" style="min-height:100px"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Pitch</button>
+          <button type="button" class="btn btn-secondary" id="clearFormBtn">Clear Form</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ──────────────── TRACKER ──────────────── -->
+  <div class="tab-panel" id="tab-tracker">
+
+    <div class="tracker-toolbar">
+      <input class="search-input" type="text" id="searchInput" placeholder="Search by property, client, location…" />
+      <div class="filter-group">
+        <select class="filter-select" id="statusFilter">
+          <option value="">All Statuses</option>
+          <option>Pending</option>
+          <option>Pitched</option>
+          <option>Follow-Up</option>
+          <option>Negotiating</option>
+          <option>Closed – Won</option>
+          <option>Closed – Lost</option>
+          <option>On Hold</option>
+        </select>
+        <select class="filter-select" id="typeFilter">
+          <option value="">All Types</option>
+          <option>Residential – Apartment</option>
+          <option>Residential – House</option>
+          <option>Commercial – Office</option>
+          <option>Commercial – Retail</option>
+          <option>Commercial – Warehouse / Industrial</option>
+          <option>Mixed-Use</option>
+          <option>Land / Development Site</option>
+          <option>Hospitality</option>
+          <option>Other</option>
+        </select>
+        <select class="filter-select" id="priorityFilter">
+          <option value="">All Priorities</option>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="exportCsvBtn">⬇ Export CSV</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="pitchTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Client</th>
+            <th>Asking Price</th>
+            <th>Pitch Date</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Follow-Up</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pitchTableBody"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🏢</div>
+      <h3>No pitches found</h3>
+      <p>Add your first pitch using the <strong>New Pitch</strong> tab.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete Pitch?</h3>
+    <p>This will permanently remove the pitch record. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="editModal" style="align-items:flex-start;padding:2rem 1rem;overflow-y:auto;">
+  <div class="modal" style="max-width:680px;width:100%;">
+    <h3 style="margin-bottom:1.25rem">Edit Pitch</h3>
+    <form id="editForm" novalidate></form>
+    <div class="modal-actions" style="margin-top:1rem;">
+      <button class="btn btn-secondary" id="cancelEdit">Cancel</button>
+      <button class="btn btn-primary" id="saveEdit">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── Storage helpers ─── */
+const STORE_KEY = 'propertyPitches';
+
+function load() {
+  return JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+}
+function save(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+/* ─── Toast ─── */
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ─── Tabs ─── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'tracker') renderTable();
+  });
+});
+
+/* ─── Status pill helper ─── */
+function statusPill(s) {
+  const map = {
+    'Pending': 'pill-pending',
+    'Pitched': 'pill-pitched',
+    'Follow-Up': 'pill-followup',
+    'Negotiating': 'pill-negotiating',
+    'Closed – Won': 'pill-won',
+    'Closed – Lost': 'pill-lost',
+    'On Hold': 'pill-pending',
+  };
+  return `<span class="pill ${map[s] || ''}">${s || '—'}</span>`;
+}
+
+function priorityIcon(p) {
+  return p === 'High' ? '🔴' : p === 'Medium' ? '🟡' : p === 'Low' ? '🟢' : '—';
+}
+
+function fmt(dateStr) {
+  if (!dateStr) return '—';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function isOverdue(dateStr) {
+  if (!dateStr) return false;
+  return new Date(dateStr) < new Date(new Date().toDateString());
+}
+
+/* ─── Render table ─── */
+function renderTable() {
+  let data = load();
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const statusF = document.getElementById('statusFilter').value;
+  const typeF = document.getElementById('typeFilter').value;
+  const priorityF = document.getElementById('priorityFilter').value;
+
+  if (search) {
+    data = data.filter(p =>
+      (p.propertyName || '').toLowerCase().includes(search) ||
+      (p.clientName || '').toLowerCase().includes(search) ||
+      (p.location || '').toLowerCase().includes(search) ||
+      (p.company || '').toLowerCase().includes(search)
+    );
+  }
+  if (statusF) data = data.filter(p => p.status === statusF);
+  if (typeF) data = data.filter(p => p.propertyType === typeF);
+  if (priorityF) data = data.filter(p => p.priority === priorityF);
+
+  const allData = load();
+  document.getElementById('trackerCount').textContent = allData.length;
+
+  const tbody = document.getElementById('pitchTableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (data.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map((p, i) => {
+    const overdue = isOverdue(p.followUpDate) && !['Closed – Won','Closed – Lost'].includes(p.status);
+    return `
+    <tr>
+      <td style="color:var(--text-muted)">${i + 1}</td>
+      <td><strong>${esc(p.propertyName)}</strong></td>
+      <td style="color:var(--text-muted);font-size:0.8rem">${esc(p.propertyType || '—')}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.location || '—')}</td>
+      <td>
+        <div>${esc(p.clientName)}</div>
+        ${p.company ? `<div style="font-size:0.75rem;color:var(--text-muted)">${esc(p.company)}</div>` : ''}
+      </td>
+      <td>${esc(p.askingPrice || '—')}</td>
+      <td>${fmt(p.pitchDate)}</td>
+      <td>${statusPill(p.status)}</td>
+      <td>${priorityIcon(p.priority)} ${p.priority || '—'}</td>
+      <td style="color:${overdue ? 'var(--danger)' : 'inherit'}">${fmt(p.followUpDate)}${overdue ? ' ⚠' : ''}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openEdit('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete('${p.id}')">Del</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+/* ─── Filter/search listeners ─── */
+['searchInput','statusFilter','typeFilter','priorityFilter'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderTable);
+});
+
+/* ─── Intake form submit ─── */
+document.getElementById('pitchForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+  const entry = {};
+  fd.forEach((v, k) => { entry[k] = v.trim(); });
+
+  if (!entry.propertyName || !entry.clientName || !entry.pitchDate || !entry.status || !entry.propertyType || !entry.location) {
+    showToast('Please fill in all required fields.', true);
+    return;
+  }
+
+  entry.id = Date.now().toString();
+  entry.createdAt = new Date().toISOString();
+
+  const data = load();
+  data.unshift(entry);
+  save(data);
+
+  form.reset();
+  showToast('✅ Pitch saved successfully!');
+  document.getElementById('trackerCount').textContent = data.length;
+});
+
+document.getElementById('clearFormBtn').addEventListener('click', () => {
+  document.getElementById('pitchForm').reset();
+});
+
+/* ─── Delete ─── */
+let pendingDeleteId = null;
+
+function openDelete(id) {
+  pendingDeleteId = id;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', () => {
+  document.getElementById('deleteModal').classList.remove('open');
+  pendingDeleteId = null;
+});
+
+document.getElementById('confirmDelete').addEventListener('click', () => {
+  if (!pendingDeleteId) return;
+  let data = load().filter(p => p.id !== pendingDeleteId);
+  save(data);
+  document.getElementById('deleteModal').classList.remove('open');
+  pendingDeleteId = null;
+  renderTable();
+  showToast('Pitch deleted.');
+});
+
+/* ─── Edit ─── */
+let editingId = null;
+
+function openEdit(id) {
+  const data = load();
+  const pitch = data.find(p => p.id === id);
+  if (!pitch) return;
+  editingId = id;
+
+  const fields = [
+    { name: 'propertyName', label: 'Property Name', type: 'text', required: true },
+    { name: 'propertyType', label: 'Property Type', type: 'select', options: ['Residential – Apartment','Residential – House','Commercial – Office','Commercial – Retail','Commercial – Warehouse / Industrial','Mixed-Use','Land / Development Site','Hospitality','Other'] },
+    { name: 'location', label: 'Location', type: 'text', required: true },
+    { name: 'askingPrice', label: 'Asking Price', type: 'text' },
+    { name: 'clientName', label: 'Client Name', type: 'text', required: true },
+    { name: 'company', label: 'Company', type: 'text' },
+    { name: 'clientEmail', label: 'Email', type: 'email' },
+    { name: 'clientPhone', label: 'Phone', type: 'tel' },
+    { name: 'pitchDate', label: 'Pitch Date', type: 'date', required: true },
+    { name: 'status', label: 'Status', type: 'select', options: ['Pending','Pitched','Follow-Up','Negotiating','Closed – Won','Closed – Lost','On Hold'], required: true },
+    { name: 'priority', label: 'Priority', type: 'select', options: ['High','Medium','Low'] },
+    { name: 'followUpDate', label: 'Follow-Up Date', type: 'date' },
+    { name: 'commission', label: 'Commission / Fee', type: 'text' },
+    { name: 'notes', label: 'Internal Notes', type: 'textarea' },
+  ];
+
+  const form = document.getElementById('editForm');
+  form.innerHTML = fields.map(f => {
+    const val = pitch[f.name] || '';
+    let input;
+    if (f.type === 'select') {
+      input = `<select name="${f.name}">${f.options.map(o =>
+        `<option ${o === val ? 'selected' : ''}>${o}</option>`
+      ).join('')}</select>`;
+    } else if (f.type === 'textarea') {
+      input = `<textarea name="${f.name}" style="min-height:70px">${val}</textarea>`;
+    } else {
+      input = `<input type="${f.type}" name="${f.name}" value="${esc(val)}" ${f.required ? 'required' : ''} />`;
+    }
+    return `<div class="form-group" style="margin-bottom:0.85rem">
+      <label>${f.label}${f.required ? ' <span class="req">*</span>' : ''}</label>
+      ${input}
+    </div>`;
+  }).join('');
+
+  document.getElementById('editModal').classList.add('open');
+}
+
+document.getElementById('cancelEdit').addEventListener('click', () => {
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+});
+
+document.getElementById('saveEdit').addEventListener('click', () => {
+  const form = document.getElementById('editForm');
+  const fd = new FormData(form);
+  const updates = {};
+  fd.forEach((v, k) => { updates[k] = v.trim(); });
+
+  if (!updates.propertyName || !updates.clientName || !updates.pitchDate || !updates.status) {
+    showToast('Please fill in all required fields.', true);
+    return;
+  }
+
+  const data = load().map(p => p.id === editingId ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p);
+  save(data);
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+  renderTable();
+  showToast('✅ Pitch updated.');
+});
+
+/* ─── Export CSV ─── */
+document.getElementById('exportCsvBtn').addEventListener('click', () => {
+  const data = load();
+  if (!data.length) { showToast('Nothing to export.', true); return; }
+
+  const cols = ['propertyName','propertyType','location','askingPrice','propertySize',
+    'clientName','company','clientEmail','clientPhone','clientType','leadSource',
+    'pitchDate','pitchMethod','status','priority','followUpDate','commission','notes'];
+
+  const header = cols.join(',');
+  const rows = data.map(p => cols.map(c => `"${(p[c] || '').replace(/"/g,'""')}"`).join(','));
+  const csv = [header, ...rows].join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'property-pitches.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ─── Init ─── */
+renderTable();
+</script>
+
+</body>
+</html>

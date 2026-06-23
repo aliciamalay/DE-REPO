@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">⚡ Activity Hub</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="index.html">Dashboard</a>
+    <a class="nav-link" href="property-pitching.html">Property Pitching</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Activity Dashboard</h1>
+    <p>Track, manage and review all your key activities in one place.</p>
+  </div>
+
+  <div class="categories-grid" id="categoriesGrid">
+
+    <a class="category-card" href="property-pitching.html" style="--card-color:#6c63ff">
+      <div class="card-icon">🏢</div>
+      <div>
+        <div class="card-title">Property Pitching</div>
+        <span class="badge badge-active">Active</span>
+      </div>
+      <div class="card-desc">Log and track property pitches, clients, deal stages and follow-up dates.</div>
+      <div class="card-stats" id="ppStats">
+        <div class="stat">Total <span id="ppTotal">0</span></div>
+        <div class="stat">Open <span id="ppOpen">0</span></div>
+        <div class="stat">Won <span id="ppWon">0</span></div>
+      </div>
+    </a>
+
+    <div class="category-card coming-soon" style="--card-color:#f0a050">
+      <div class="card-icon">💡</div>
+      <div>
+        <div class="card-title">Thought Leadership</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="card-desc">Manage articles, speaking engagements, podcasts and content ideas.</div>
+    </div>
+
+    <div class="category-card coming-soon" style="--card-color:#4caf88">
+      <div class="card-icon">🤝</div>
+      <div>
+        <div class="card-title">Networking</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="card-desc">Track contacts, meetings, referrals and relationship status.</div>
+    </div>
+
+    <div class="category-card coming-soon" style="--card-color:#e05a5a">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Deals & Transactions</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="card-desc">Monitor active deals, due diligence, and closing timelines.</div>
+    </div>
+
+    <div class="category-card coming-soon" style="--card-color:#e880f0">
+      <div class="card-icon">📣</div>
+      <div>
+        <div class="card-title">Marketing Campaigns</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="card-desc">Campaigns, channels, performance and budgets.</div>
+    </div>
+
+    <div class="category-card coming-soon" style="--card-color:#50c8f0">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">Market Research</div>
+        <span class="badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="card-desc">Research notes, reports and market trend tracking.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Pull live stats from localStorage
+  function updateStats() {
+    const pitches = JSON.parse(localStorage.getItem('propertyPitches') || '[]');
+    document.getElementById('ppTotal').textContent = pitches.length;
+    document.getElementById('ppOpen').textContent = pitches.filter(p =>
+      ['Pending','Pitched','Follow-Up','Negotiating'].includes(p.status)
+    ).length;
+    document.getElementById('ppWon').textContent = pitches.filter(p => p.status === 'Closed – Won').length;
+  }
+  updateStats();
+</script>
+
+</body>
+</html>
